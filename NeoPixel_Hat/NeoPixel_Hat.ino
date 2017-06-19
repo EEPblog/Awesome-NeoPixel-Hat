@@ -22,9 +22,9 @@
 //===========================================================================================================
 #include <Adafruit_NeoPixel.h>
 
-#define STAT 8                       //status pin from the Bluetooth module
+#define STAT 8  -  -  -  -  -  -  -  -  -  -  -  - //status pin from the Bluetooth module
 
-int mode = 100;                      //define everything global
+int mode = 100;                                    //define everything global
 int spd, red, grn, blu, showVolts;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(36, 6, NEO_GRB + NEO_KHZ800); //Start the strip with 36 LEDs on pin 6
@@ -56,59 +56,59 @@ void setup() {
 //===========================================================================================================
 
 void loop() {
-  receive();                                      //receive the data from terminal
-  if (showVolts) {                                //if there was a request for voltage
+  receive();                                        //receive the data from terminal
+  if (showVolts) {                                  //if there was a request for voltage
     float voltage = (analogRead(A0) / 1024.0) * 5.0;  //measure it, convert it to a whole
-    byte val = floor(voltage * 10);               //number and send it. I'm multiplying
-    Serial.println(val);                          //it by ten, so i can than get one
-                                                  //decimal point in the app later.
+    byte val = floor(voltage * 10);                 //number and send it. I'm multiplying
+    Serial.println(val);                            //it by ten, so i can than get one
+                                                    //decimal point in the app later.
   }
-  if (showVolts == 2) {                           //if there was a request for debug info,
-    Serial.print("current setting: ");            //send it.
+  if (showVolts == 2) {                             //if there was a request for debug info,
+    Serial.print("current setting: ");              //send it.
     Serial.print(mode); Serial.print(", ");
     Serial.print(spd); Serial.print(", ");
     Serial.print(red); Serial.print(", ");
     Serial.print(grn); Serial.print(", ");
     Serial.println(blu);
   }
-  showVolts = 0;                                  //resets the request integer so it doesn't flood the terminal
+  showVolts = 0;                                    //resets the request integer so it doesn't flood the terminal
   
-  strip.setBrightness(255);                       //resets the strip brightness
+  strip.setBrightness(255);                         //resets the strip brightness
   
-  switch (mode) {                                 //checks the current mode and sets up the animations accordingly
+  switch (mode) {                                   //checks the current mode and sets up the animations accordingly
     default:
-      for (int j = 0; j < strip.numPixels(); j++) {         //this animation shows, that something's not quite right :/
+      for (int j = 0; j < strip.numPixels(); j++) { //this animation shows, that something's not quite right :/
         strip.setPixelColor(j, 0, 0, 0); //clears the strip
       }
       ring(8, 0, 0);
       break;
-    case 100:                                              //this is the "first power-on" animation, it is saying, that
-      spd = 20;                                            //it is definitely ready to receive commands
+    case 100:                                        //this is the "first power-on" animation, it is saying, that
+      spd = 20;                                      //it is definitely ready to receive commands
       blu = 10;
       breathe(20, 0, 0, 10);
       break;
-    case 1:                                                //mode 1: spectrum effect (or hue effect), ignores R, G, B values
+    case 1:                                          //mode 1: spectrum effect (or hue effect), ignores R, G, B values
       hue(spd);
       break;
-    case 2:                                                //mode 2: static color, ignores the speed (spd) value
+    case 2:                                          //mode 2: static color, ignores the speed (spd) value
       ring(red, grn, blu);
       break;
-    case 3:                                                //mode 3: breathing effect
+    case 3:                                          //mode 3: breathing effect
       breathe(spd, red, grn, blu);
       break;
-    case 4:                                                //mode 4: beacon effect
+    case 4:                                          //mode 4: beacon effect
       cop(spd, red, grn, blu);
       break;
-    case 5:                                                //mode 5: theater style lights, changes colors throughout, ignores R, G, B values
+    case 5:                                          //mode 5: theater style lights, changes colors throughout, ignores R, G, B values
       theaterChaseRainbow(spd);
       break;
-    case 6:                                                //mode 6: gradually changes the colors, not all colors of the spectrum are shown at the same time,
-      hue2(spd);                                           //you'll se what i mean... ignores R, G, B values; currently unsupported in the official app.
+    case 6:                                          //mode 6: gradually changes the colors, not all colors of the spectrum are shown at the same time,
+      hue2(spd);                                     //you'll se what i mean... ignores R, G, B values; currently unsupported in the official app.
       break;
-    case 7:                                                //mode 7: same as mode 5, except it has user definable color; currently unsupported in the official app.
+    case 7:                                          //mode 7: same as mode 5, except it has user definable color; currently unsupported in the official app.
       theaterChase(spd, red, grn, blu);
       break;
-//    case 8:                                                //mode 8: Knight Rider, this was just a test, was't thoroughly thought through and is not currently supported in the official app anyway...
+//    case 8:                                        //mode 8: Knight Rider, this was just a test, was't thoroughly thought through and is not currently supported in the official app anyway...
 //      knightRider(spd, 8);
 //      break;
   }
@@ -220,7 +220,7 @@ void theaterChaseRainbow(int wait) {
     }
   }
 }
-//-------------------------------------------------------------------------------------MODE 7: Static COlor Theatre Effect
+//-------------------------------------------------------------------------------------MODE 7: Static Color Theatre Effect
 void theaterChase(uint8_t sp, int r, int g, int b) {
   for (int j = 0; j < 10; j++) { //do 10 cycles of chasing
     for (int q = 0; q < 3; q++) {
@@ -276,15 +276,15 @@ uint32_t dimColor(uint32_t color, uint8_t width) {
 
 bool receive() {
   bool newData = 1;
-  while (Serial.available() > 0) {
-    showVolts = Serial.parseInt();
-    int amode = Serial.parseInt();
-    int aspd = Serial.parseInt();
-    int ared = Serial.parseInt();
-    int agrn = Serial.parseInt();
-    int ablu = Serial.parseInt();
-
-
+  while (Serial.available() > 0) {                            //read the incomming data form serial monitor in
+    showVolts = Serial.parseInt();                            //the following data format:
+    int amode = Serial.parseInt();                            //Request for send, Mode, Speed, Red, Green, Blue
+    int aspd = Serial.parseInt();                             //Request for send - 0 = no request for batt voltage; 1 = just batt voltage; 2 = batt voltage and current settings
+    int ared = Serial.parseInt();                             //Mode - Sets the animation mode
+    int agrn = Serial.parseInt();                             //Speed - Sets the speed for the current mode, if applicable
+    int ablu = Serial.parseInt();                             //Red, Green, Blue - color values for the strip, if applicable
+                                                              //for example: 0,3,20,255,0,0 - will make the strip breathe with 20ms steps in red color
+                                                              //             2              - will report the current battery voltage x10 and the current settings
     if (Serial.read() == '\n') {
       if ((amode == mode) && (aspd == spd) && (ared == red) && (agrn == grn) && (ablu == blu) && !showVolts) {
         newData = 0;
